@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Petite-Vue and Craft CMS</title>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+    </style>
+    <script type="module" src="/js/app.js"></script>
+  </head>
+  <body>
+    <h1>Testing this</h1>
+    <div
+      id="app"
+      v-effect="getResources()"
+      @vue:mounted="getCategories()"
+      v-cloak>
+      <div>
+        <form @submit.prevent>
+          <h2>Search</h2>
+          <input type="search" v-model="q" :value="searchQuery" />
+          <input type="submit" value="Search" @click.prevent="setSearch()" />
+          <input type="button" value="Clear" @click.prevent="clearSearch()" />
+
+          <details>
+            <summary>Filter by categories</summary>
+            <div>
+              <p v-show="categories.length === 0">loading categories</p>
+              <div v-show="categories.length > 0">
+                <ul>
+                  <li v-for="item in categories" :key="item.id">
+                    <div>
+                      <input
+                        type="checkbox"
+                        :id="item.id"
+                        :value="item.id"
+                        @change="currentPage = 1"
+                        v-model="checkedCategoriesIds" />
+                      <label :for="item.id" v-text="item.title"></label>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        </form>
+      </div>
+
+      <h2>Resources</h2>
+
+      <p v-show="resources.length === 0">Pinging database</p>
+
+      <div v-show="resources.length > 0">
+        <p>
+          <span v-text="totalResults"></span>
+          resources found
+        </p>
+        <ul>
+          <li v-for="item in resources" :key="item.id">
+            <article>
+              <h2>
+                <a :href="item.commonUrl" v-text="item.title"></a>
+              </h2>
+              <p v-text="item.resourceSummary"></p>
+            </article>
+          </li>
+        </ul>
+        <p>
+          <button @click="prevPage()" :disabled="currentPage === 1">
+            Previous
+          </button>
+          <button @click="nextPage()" :disabled="currentPage === totalPages">
+            Next
+          </button>
+          Page
+          <span v-text="currentPage"></span>
+          of
+          <span v-text="totalPages"></span>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
