@@ -4,12 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "browser-sync start --server \"./dist/\" --files \"./dist/\"",
+    "scripts:dev": "esbuild \"./src/js/app.js\" --bundle --outfile=\"./dist/js/app.js\"",
+    "scripts:prod": "esbuild \"./src/js/app.js\" --outfile=\"./dist/js/app.js\"",
+    "copy:html": "copyfiles -u 1 \"./src/*.html\" \"./dist/\"",
+    "watch:html": "onchange \"./src/**/*.html\" -- npm run copy:html",
+    "watch:scripts": "onchange \"./src/js/**/*.js\" -- npm run scripts:dev",
+    "dev": "npm-run-all --parallel server watch:*"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "browser-sync": "^3.0.2",
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.19.12",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
     "petite-vue": "^0.4.1"
   }
 }
