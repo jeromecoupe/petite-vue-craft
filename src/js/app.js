@@ -1,6 +1,7 @@
 import { createApp } from "petite-vue";
+import { debounce } from "lodash";
 
-// nomber of items to display per page
+// number of items to display per page
 const ITEMS_PER_PAGE = 10;
 
 // base categories query
@@ -38,17 +39,20 @@ createApp({
   resources: [],
   categories: [],
   checkedCategoriesIds: [],
-  q: "",
   searchQuery: "",
   totalResults: 0,
   totalPages: 0,
   currentPage: 1,
   loading: true,
+  debounceSearchInput: debounce(function (event) {
+    this.currentPage = 1;
+    this.searchQuery = event.target.value;
+  }, 200),
 
   // get all categories
   async getCategories() {
     try {
-      const response = await fetch("https://cinecolab.ddev.site/api", {
+      const response = await fetch("https://www.cinecolab.be/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,8 +78,10 @@ createApp({
   // get resources with params
   async getResources() {
     try {
+      // update URL with query strings ?
+
       // get response
-      const response = await fetch("https://cinecolab.ddev.site/api", {
+      const response = await fetch("https://www.cinecolab.be/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -104,15 +110,6 @@ createApp({
     } catch (error) {
       throw new Error(`Fetch ${error}`);
     }
-  },
-  clearSearch() {
-    this.q = "";
-    this.searchQuery = "";
-    this.currentPage = 1;
-  },
-  setSearch() {
-    this.searchQuery = this.q;
-    this.currentPage = 1;
   },
   prevPage() {
     this.currentPage--;

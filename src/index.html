@@ -18,40 +18,31 @@
       v-effect="getResources()"
       @vue:mounted="getCategories()"
       v-cloak>
-      <div>
-        <form @submit.prevent>
-          <h2>Search</h2>
-          <input type="search" v-model="q" :value="searchQuery" />
-          <input type="submit" value="Search" @click.prevent="setSearch()" />
-          <input type="button" value="Clear" @click.prevent="clearSearch()" />
+      <form @submit.prevent method="get">
+        <h2>Search</h2>
+        <input
+          type="search"
+          @input="debounceSearchInput"
+          :value="searchQuery" />
 
-          <details>
-            <summary>Filter by categories</summary>
-            <div>
-              <p v-show="categories.length === 0">loading categories</p>
-              <div v-show="categories.length > 0">
-                <ul>
-                  <li v-for="item in categories" :key="item.id">
-                    <div>
-                      <input
-                        type="checkbox"
-                        :id="item.id"
-                        :value="item.id"
-                        @change="currentPage = 1"
-                        v-model="checkedCategoriesIds" />
-                      <label :for="item.id" v-text="item.title"></label>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </details>
-        </form>
-      </div>
+        <p v-show="categories.length === 0">loading categories</p>
+        <ul v-show="categories.length > 0">
+          <li v-for="item in categories" :key="item.id">
+            <label>
+              <input
+                type="checkbox"
+                :value="item.id"
+                @change="currentPage = 1"
+                v-model="checkedCategoriesIds" />
+              <span v-text="item.title"></span>
+            </label>
+          </li>
+        </ul>
+      </form>
 
       <h2>Resources</h2>
 
-      <p v-show="resources.length === 0">Pinging database</p>
+      <p v-show="resources.length === 0">No ressources found</p>
 
       <div v-show="resources.length > 0">
         <p>
