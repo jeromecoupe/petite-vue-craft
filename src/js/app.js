@@ -38,8 +38,9 @@ createApp({
   // variables
   resources: [],
   categories: [],
-  checkedCategoriesIds: [],
-  searchQuery: "",
+  checkedCategoriesIds:
+    new URLSearchParams(location.search).get("catIds").split(",") ?? [],
+  searchQuery: new URLSearchParams(location.search).get("q") ?? "",
   totalResults: 0,
   totalPages: 0,
   currentPage: 1,
@@ -48,6 +49,13 @@ createApp({
     this.currentPage = 1;
     this.searchQuery = event.target.value;
   }, 200),
+
+  setQueryStringValues() {
+    let urlParams = new URLSearchParams();
+    urlParams.set("q", this.searchQuery);
+    urlParams.set("catIds", this.checkedCategoriesIds);
+    history.replaceState(null, document.title, "?" + urlParams.toString());
+  },
 
   // get all categories
   async getCategories() {
@@ -102,6 +110,9 @@ createApp({
 
       // convert to json
       const responseJson = await response.json();
+
+      // set query Strings
+      this.setQueryStringValues();
 
       // assign vars
       this.resources = responseJson.data.entries;

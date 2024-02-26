@@ -20,6 +20,10 @@
       v-cloak>
       <form @submit.prevent method="get">
         <h2>Search</h2>
+
+        <p>Search for: <span v-text="searchQuery"></span></p>
+        <p>Categories IDs: <span v-text="checkedCategoriesIds"></span></p>
+
         <input
           type="search"
           @input="debounceSearchInput"
@@ -33,7 +37,8 @@
                 type="checkbox"
                 :value="item.id"
                 @change="currentPage = 1"
-                v-model="checkedCategoriesIds" />
+                v-model="checkedCategoriesIds"
+                :checked="checkedCategoriesIds.includes(item.id)" />
               <span v-text="item.title"></span>
             </label>
           </li>
