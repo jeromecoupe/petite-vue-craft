@@ -4,6 +4,18 @@ import { debounce } from "lodash";
 // number of items to display per page
 const ITEMS_PER_PAGE = 10;
 
+// query params
+const urlParams = new URLSearchParams(location.search);
+
+// get categories from url and make sure it's an array
+function getCatsFromUrl() {
+  let catsList = [];
+  if (urlParams.get("catsIds")) {
+    catsList = urlParams.get("catsIds").split(",");
+  }
+  return catsList;
+}
+
 // base categories query
 const categoriesQuery = `query allCategories {
   entries(section: "resourcesCategories", orderBy: "title ASC", relatedToEntries: [{section: "resources"}]) {
@@ -38,9 +50,8 @@ createApp({
   // variables
   resources: [],
   categories: [],
-  checkedCategoriesIds:
-    new URLSearchParams(location.search).get("catIds").split(",") ?? [],
-  searchQuery: new URLSearchParams(location.search).get("q") ?? "",
+  checkedCategoriesIds: getCatsFromUrl(),
+  searchQuery: urlParams.get("q") || "",
   totalResults: 0,
   totalPages: 0,
   currentPage: 1,
@@ -49,13 +60,6 @@ createApp({
     this.currentPage = 1;
     this.searchQuery = event.target.value;
   }, 200),
-
-  setQueryStringValues() {
-    let urlParams = new URLSearchParams();
-    urlParams.set("q", this.searchQuery);
-    urlParams.set("catIds", this.checkedCategoriesIds);
-    history.replaceState(null, document.title, "?" + urlParams.toString());
-  },
 
   // get all categories
   async getCategories() {
@@ -86,7 +90,11 @@ createApp({
   // get resources with params
   async getResources() {
     try {
-      // update URL with query strings ?
+      // set query Strings
+      let url = new URL(location);
+      url.searchParams.set("q", this.searchQuery);
+      url.searchParams.set("catsIds", this.checkedCategoriesIds);
+      history.pushState({}, "", url);
 
       // get response
       const response = await fetch("https://www.cinecolab.be/api", {
@@ -110,9 +118,6 @@ createApp({
 
       // convert to json
       const responseJson = await response.json();
-
-      // set query Strings
-      this.setQueryStringValues();
 
       // assign vars
       this.resources = responseJson.data.entries;
